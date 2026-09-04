@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Carrot Kilo & Amount Calculator</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f5f7f7;
+        color: #202124;
+    }
+
+    .app {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 12px;
+    }
+
+    .topbar {
+        background: #22c7c9;
+        color: white;
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .topbar h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .sheet-name {
+        font-size: 14px;
+        opacity: .9;
+    }
+
+    .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    button {
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: #22c7c9;
+        color: white;
+    }
+
+    button:active {
+        transform: scale(.97);
+    }
+
+    .danger {
+        background: #e85d5d;
+    }
+
+    .secondary {
+        background: #e8eeee;
+        color: #1677c8;
+    }
+
+    .sheet-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        padding-bottom: 3px;
+    }
+
+    .sheet-button {
+        white-space: nowrap;
+        background: #dceeee;
+        color: #222;
+    }
+
+    .sheet-button.active {
+        background: #22c7c9;
+        color: white;
+    }
+
+    .calculator-card {
+        background: white;
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 10px;
+    }
+
+    table {
+        border-collapse: collapse;
+        min-width: 720px;
+        width: max-content;
+    }
+
+    th,
+    td {
+        border: 1px solid #d5dddd;
+        height: 52px;
+        padding: 0;
+        text-align: center;
+    }
+
+    th {
+        background: #9ccc7f;
+        font-size: 17px;
+        font-weight: bold;
+        position: relative;
+    }
+
+    .number-column {
+        width: 70px;
+        min-width: 70px;
+    }
+
+    .buyer-column {
+        width: 125px;
+        min-width: 125px;
+    }
+
+    .buyer-header {
+        background: #9ccc7f;
+        padding: 0;
+    }
+
+    .buyer-input {
+        width: 100%;
+        height: 52px;
+        border: 0;
+        background: transparent;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #202124;
+        outline: none;
+        padding: 4px;
+    }
+
+    .buyer-input:focus {
+        background: #ffffff;
+        box-shadow: inset 0 0 0 2px #22c7c9;
+    }
+
+    .kilo-input {
+        width: 100%;
+        height: 52px;
+        border: 0;
+        text-align: center;
+        font-size: 18px;
+        outline: none;
+        background: white;
+    }
+
+    .kilo-input:focus,
+    .number-input:focus {
+        box-shadow: inset 0 0 0 2px #22c7c9;
+    }
+
+    .number-cell {
+        font-size: 18px;
+        font-weight: bold;
+        background: #fafcfc;
+    }
+
+    .summary-label {
+        text-align: left;
+        padding-left: 12px;
+        font-weight: bold;
+        background: #dcefd4;
+        min-width: 150px;
+    }
+
+    .summary-value {
+        font-size: 18px;
+        font-weight: bold;
+        background: #e5f4df;
+        min-width: 125px;
+    }
+
+    .less-input,
+    .price-input {
+        width: 100%;
+        height: 52px;
+        border: 0;
+        text-align: center;
+        font-size: 17px;
+        outline: none;
+    }
+
+    .total-row td {
+        background: #b9dca8;
+        font-weight: bold;
+    }
+
+    .grand-section {
+        margin-top: 18px;
+        background: white;
+        border-radius: 16px;
+        padding: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .grand-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: #dcefd4;
+        font-size: 19px;
+        font-weight: bold;
+    }
+
+    .grand-total {
+        background: #9ccc7f;
+        font-size: 21px;
+    }
+
+    .divider {
+        width: 8px;
+        min-width: 8px;
+        cursor: col-resize;
+        background: #d0dada;
+    }
+
+    .hint {
+        font-size: 13px;
+        color: #666;
+        margin: 8px 2px 0;
+    }
+
+    @media (max-width: 600px) {
+        .app {
+            padding: 8px;
+        }
+
+        .topbar h1 {
+            font-size: 21px;
+        }
+
+        button {
+            font-size: 14px;
+            padding: 10px 12px;
+        }
+
+        .buyer-column {
+            width: 115px;
+            min-width: 115px;
+        }
+
+        .number-column {
+            width: 60px;
+            min-width: 60px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="topbar">
+        <div>
+            <h1>🥕 Carrot Calculator</h1>
+            <div class="sheet-name" id="currentSheetName">Client 1</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="addColumn()">＋ Add Buyer</button>
+        <button class="danger" onclick="removeColumn()">− Remove Buyer</button>
+    </div>
+
+    <div class="sheet-buttons" id="sheetButtons"></div>
+
+    <div class="controls">
+        <button onclick="addSheet()">＋ Add Client</button>
+        <button class="danger" onclick="removeSheet()">− Remove Client</button>
+    </div>
+
+    <div class="calculator-card">
+
+        <div class="table-wrap">
+            <table id="calculatorTable">
+
+                <thead>
+                    <tr id="buyerHeader">
+                        <th class="number-column">#</th>
+                    </tr>
+                </thead>
+
+                <tbody id="kiloRows"></tbody>
+
+                <tbody id="summaryRows"></tbody>
+
+            </table>
+        </div>
+
+        <div class="hint">
+            Swipe left/right to see more buyers. You can type the buyer's name directly in the green header.
+        </div>
+
+    </div>
+
+    <div class="grand-section">
+
+        <div class="grand-row">
+            <span>Σ of Total</span>
+            <span id="grandTotal">0.00</span>
+        </div>
+
+        <div class="grand-row">
+            <span>Less</span>
+            <input
+                id="grandLess"
+                type="number"
+                inputmode="decimal"
+                value="0"
+                style="width:110px;text-align:right;border:0;background:transparent;font-size:18px;font-weight:bold;outline:none;"
+                oninput="calculate()">
+        </div>
+
+        <div class="grand-row grand-total">
+            <span>Total Amount</span>
+            <span id="grandAmount">0.00</span>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+let sheets = [
+    {
+        name: "Client 1",
+        buyers: [
+            { name: "Buyer 1", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 2", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 3", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 4", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 5", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 6", kilos: Array(10).fill(""), less: 10, price: 0 }
+        ]
+    }
+];
+
+let currentSheet = 0;
+
+
+/* =========================================================
+   SAVE / LOAD
+========================================================= */
+
+function saveData() {
+    localStorage.setItem(
+        "carrotCalculatorData",
+        JSON.stringify({
+            sheets: sheets,
+            currentSheet: currentSheet
+        })
+    );
+}
+
+function loadData() {
+
+    const saved = localStorage.getItem("carrotCalculatorData");
+
+    if (!saved) return;
+
+    try {
+
+        const data = JSON.parse(saved);
+
+        if (data.sheets && data.sheets.length) {
+            sheets = data.sheets;
+        }
+
+        if (typeof data.currentSheet === "number") {
+            currentSheet = data.currentSheet;
+        }
+
+    } catch (e) {
+        console.log("Could not load saved data.");
+    }
+}
+
+
+/* =========================================================
+   BUILD TABLE
+========================================================= */
+
+function buildTable() {
+
+    const sheet = sheets[currentSheet];
+
+    document.getElementById("currentSheetName").textContent =
+        sheet.name;
+
+    const header = document.getElementById("buyerHeader");
+    header.innerHTML = '<th class="number-column">#</th>';
+
+    /* BUYER COLUMNS */
+
+    sheet.buyers.forEach((buyer, index) => {
+
+        const th = document.createElement("th");
+
+        th.className = "buyer-column buyer-header";
+
+        const input = document.createElement("input");
+
+        input.type = "text";
+        input.className = "buyer-input";
+        input.value = buyer.name;
+
+        input.placeholder = "Buyer name";
+
+        input.addEventListener("input", function () {
+            buyer.name = this.value;
+            saveData();
+        });
+
+        th.appendChild(input);
+
+        header.appendChild(th);
+
+    });
+
+
+    /* KILO ROWS */
+
+    const kiloRows = document.getElementById("kiloRows");
+
+    kiloRows.innerHTML = "";
+
+    for (let row = 0; row < 10; row++) {
+
+        const tr = document.createElement("tr");
+
+        const number = document.createElement("td");
+
+        number.className = "number-cell number-column";
+
+        number.textContent = row + 1;
+
+        tr.appendChild(number);
+
+        sheet.buyers.forEach((buyer, buyerIndex) => {
+
+            const td = document.createElement("td");
+
+            td.className = "buyer-column";
+
+            const input = document.createElement("input");
+
+            input.type = "number";
+            input.inputMode = "decimal";
+            input.className = "kilo-input";
+
+            input.value = buyer.kilos[row];
+
+            input.placeholder = "0";
+
+            input.addEventListener("input", function () {
+
+                buyer.kilos[row] = this.value;
+
+                calculate();
+                saveData();
+
+            });
+
+            td.appendChild(input);
+
+            tr.appendChild(td);
+
+        });
+
+        kiloRows.appendChild(tr);
+    }
+
+
+    buildSummary();
+
+    buildSheets();
+
+    calculate();
+}
+
+
+/* =========================================================
+   SUMMARY ROWS
+========================================================= */
+
+function buildSummary() {
+
+    const sheet = sheets[currentSheet];
+
+    const summary = document.getElementById("summaryRows");
+
+    summary.innerHTML = "";
+
+    /* TOTAL KILO */
+
+    let tr = document.createElement("tr");
+
+    let label = document.createElement("td");
+
+    label.className = "summary-label";
+    label.textContent = "Total Kilo";
+
+    tr.appendChild(label);
+
+    sheet.buyers.forEach((buyer) => {
+
+        const td = document.createElement("td");
+
+        td.className = "summary-value";
+
+        td.id = "totalKilo-" + sheet.buyers.indexOf(buyer);
+
+        td.textContent = "0";
+
+        tr.appendChild(td);
+
+    });
+
+    summary.appendChild(tr);
+
+
+    /* LESS */
+
+    tr = document.createElement("tr");
+
+    label = document.createElement("td");
+
+    label.className = "summary-label";
+    label.textContent = "Less";
+
+    tr.appendChild(label);
+
+    sheet.buyers.forEach((buyer, index) => {
+
+        const td = document.createElement("td");
+
+        td.className = "buyer-column";
+
+        const input = document.createElement("input");
+
+        input.type = "number";
+        input.inputMode = "decimal";
+        input.className = "less-input";
+
+        input.value = buyer.less;
+
+        input.addEventListener("input", function () {
+
+            buyer.less = this.value;
+
+            calculate();
+            saveData();
+
+        });
+
+        td.appendChild(input);
+
+        tr.appendChild(td);
+
+    });
+
+    summary.appendChild(tr);
+
+
+    /* TOTAL KILO AFTER LESS */
+
+    tr = document.createElement("tr");
+
+    label = document.createElement("td");
+
+    label.className = "summary-label";
+    label.textContent = "Total Kilo";
+
+    tr.appendChild(label);
+
+    sheet.buyers.forEach((buyer, index) => {
+
+        const td = document.createElement("td");
+
+        td.className = "summary-value";
+
+        td.id = "netKilo-" + index;
+
+        td.textContent = "0";
+
+        tr.appendChild(td);
+
+    });
+
+    summary.appendChild(tr);
+
+
+    /* PRICE */
+
+    tr = document.createElement("tr");
+
+    label = document.createElement("td");
+
+    label.className = "summary-label";
+    label.textContent = "Price";
+
+    tr.appendChild(label);
+
+    sheet.buyers.forEach((buyer) => {
+
+        const td = document.createElement("td");
+
+        const input = document.createElement("input");
+
+        input.type = "number";
+        input.inputMode = "decimal";
+        input.className = "price-input";
+
+        input.value = buyer.price || "";
+
+        input.placeholder = "0.00";
+
+        input.addEventListener("input", function () {
+
+            buyer.price = this.value;
+
+            calculate();
+            saveData();
+
+        });
+
+        td.appendChild(input);
+
+        tr.appendChild(td);
+
+    });
+
+    summary.appendChild(tr);
+
+
+    /* TOTAL */
+
+    tr = document.createElement("tr");
+
+    tr.className = "total-row";
+
+    label = document.createElement("td");
+
+    label.className = "summary-label";
+
+    label.textContent = "Total";
+
+    tr.appendChild(label);
+
+    sheet.buyers.forEach((buyer, index) => {
+
+        const td = document.createElement("td");
+
+        td.className = "summary-value";
+
+        td.id = "buyerTotal-" + index;
+
+        td.textContent = "0.00";
+
+        tr.appendChild(td);
+
+    });
+
+    summary.appendChild(tr);
+
+}
+
+
+/* =========================================================
+   CALCULATE
+========================================================= */
+
+function calculate() {
+
+    const sheet = sheets[currentSheet];
+
+    let grandTotal = 0;
+
+    sheet.buyers.forEach((buyer, index) => {
+
+        let totalKilo = 0;
+
+        buyer.kilos.forEach(value => {
+
+            const number = parseFloat(value);
+
+            if (!isNaN(number)) {
+                totalKilo += number;
+            }
+
+        });
+
+        const less = parseFloat(buyer.less) || 0;
+
+        const price = parseFloat(buyer.price) || 0;
+
+        const netKilo = totalKilo - less;
+
+        const total = netKilo * price;
+
+        const totalKiloElement =
+            document.getElementById("totalKilo-" + index);
+
+        const netKiloElement =
+            document.getElementById("netKilo-" + index);
+
+        const totalElement =
+            document.getElementById("buyerTotal-" + index);
+
+        if (totalKiloElement) {
+            totalKiloElement.textContent =
+                formatNumber(totalKilo);
+        }
+
+        if (netKiloElement) {
+            netKiloElement.textContent =
+                formatNumber(netKilo);
+        }
+
+        if (totalElement) {
+            totalElement.textContent =
+                formatMoney(total);
+        }
+
+        grandTotal += total;
+
+    });
+
+
+    const grandLess =
+        parseFloat(document.getElementById("grandLess").value) || 0;
+
+    const finalAmount = grandTotal - grandLess;
+
+    document.getElementById("grandTotal").textContent =
+        formatMoney(grandTotal);
+
+    document.getElementById("grandAmount").textContent =
+        formatMoney(finalAmount);
+
+    saveData();
+}
+
+
+/* =========================================================
+   FORMATTING
+========================================================= */
+
+function formatNumber(number) {
+
+    return Number(number).toLocaleString(undefined, {
+        maximumFractionDigits: 2
+    });
+
+}
+
+function formatMoney(number) {
+
+    return Number(number).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+}
+
+
+/* =========================================================
+   ADD BUYER COLUMN
+========================================================= */
+
+function addColumn() {
+
+    const sheet = sheets[currentSheet];
+
+    const nextNumber = sheet.buyers.length + 1;
+
+    sheet.buyers.push({
+        name: "Buyer " + nextNumber,
+        kilos: Array(10).fill(""),
+        less: 10,
+        price: 0
+    });
+
+    saveData();
+
+    buildTable();
+}
+
+
+/* =========================================================
+   REMOVE BUYER COLUMN
+========================================================= */
+
+function removeColumn() {
+
+    const sheet = sheets[currentSheet];
+
+    if (sheet.buyers.length <= 1) {
+
+        alert("You need at least one buyer.");
+
+        return;
+    }
+
+    if (
+        confirm(
+            "Remove the last buyer column?"
+        )
+    ) {
+
+        sheet.buyers.pop();
+
+        saveData();
+
+        buildTable();
+
+    }
+}
+
+
+/* =========================================================
+   ADD CLIENT / SHEET
+========================================================= */
+
+function addSheet() {
+
+    const newNumber = sheets.length + 1;
+
+    sheets.push({
+        name: "Client " + newNumber,
+        buyers: [
+            { name: "Buyer 1", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 2", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 3", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 4", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 5", kilos: Array(10).fill(""), less: 10, price: 0 },
+            { name: "Buyer 6", kilos: Array(10).fill(""), less: 10, price: 0 }
+        ]
+    });
+
+    currentSheet = sheets.length - 1;
+
+    saveData();
+
+    buildTable();
+}
+
+
+/* =========================================================
+   REMOVE CLIENT / SHEET
+========================================================= */
+
+function removeSheet() {
+
+    if (sheets.length <= 1) {
+
+        alert("You need at least one client.");
+
+        return;
+    }
+
+    if (
+        confirm(
+            "Remove this client and all of its buyer data?"
+        )
+    ) {
+
+        sheets.splice(currentSheet, 1);
+
+        if (currentSheet >= sheets.length) {
+            currentSheet = sheets.length - 1;
+        }
+
+        saveData();
+
+        buildTable();
+    }
+}
+
+
+/* =========================================================
+   SHEET BUTTONS
+========================================================= */
+
+function buildSheets() {
+
+    const container =
+        document.getElementById("sheetButtons");
+
+    container.innerHTML = "";
+
+    sheets.forEach((sheet, index) => {
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "sheet-button" +
+            (index === currentSheet ? " active" : "");
+
+        button.textContent =
+            sheet.name;
+
+        button.onclick = function () {
+
+            currentSheet = index;
+
+            saveData();
+
+            buildTable();
+
+        };
+
+        container.appendChild(button);
+
+    });
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadData();
+
+buildTable();
+
+</script>
+
+</body>
+</html>
