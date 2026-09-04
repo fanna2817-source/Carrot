@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#82c56d">
-<title>Carrot Calculator</title>
+<meta name="theme-color" content="#7fbf6a">
+<title>Carrot KG & Amount Calculator</title>
 
 <style>
 * {
@@ -13,1003 +13,455 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: Arial, sans-serif;
   background: #f5f7f3;
   color: #222;
 }
 
-.container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 10px;
+.app {
+  max-width: 1000px;
+  margin: auto;
+  padding: 15px;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+h1 {
+  text-align: center;
+  color: #5b9d4c;
+  margin-bottom: 5px;
 }
 
-.title {
-  font-size: 27px;
-  font-weight: 700;
-  color: #559c4d;
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 15px;
 }
 
-.saved {
-  color: #777;
-  font-size: 14px;
-}
-
-.sheet-bar {
+.sheet-controls {
   display: flex;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 5px;
+  margin-bottom: 12px;
 }
 
-.sheet-btn,
-.new-sheet,
-.remove-sheet {
+button {
   border: none;
-  border-radius: 14px;
-  padding: 12px 20px;
-  font-size: 17px;
-  font-weight: 700;
-  white-space: nowrap;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-.sheet-btn {
-  background: #91c978;
-  color: #222;
-}
-
-.new-sheet {
-  background: #222;
+.add-sheet {
+  background: #6faa5c;
   color: white;
 }
 
 .remove-sheet {
-  margin-top: 8px;
-  background: #eadede;
-  color: #0785e9;
+  background: #ddd;
 }
 
-.controls {
+.sheet-tabs {
   display: flex;
-  gap: 8px;
-  margin: 10px 0;
-}
-
-.add-btn,
-.remove-btn {
-  border: none;
-  border-radius: 14px;
-  padding: 12px 18px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.add-btn {
-  background: #82c56d;
-  color: white;
-}
-
-.remove-btn {
-  background: #eadede;
-  color: #0785e9;
-}
-
-/* Horizontal scrolling */
-.table-wrap {
-  width: 100%;
+  gap: 6px;
   overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 18px;
+  margin-bottom: 12px;
+}
+
+.sheet-tab {
   background: white;
-  box-shadow: 0 3px 15px rgba(0,0,0,.08);
+  border: 1px solid #ccc;
 }
 
-/*
-  1 number column + 6 buyer columns.
-  Additional buyers automatically make the table wider
-  and can be reached by horizontal scrolling.
-*/
+.sheet-tab.active {
+  background: #9acb83;
+  font-weight: bold;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
 table {
   border-collapse: collapse;
-  width: max-content;
-  min-width: 100%;
+  min-width: 760px;
+  width: 100%;
 }
 
 th,
 td {
-  border-right: 2px solid #d9ddd8;
-  border-bottom: 2px solid #d9ddd8;
+  border: 1px solid #ccc;
+  padding: 7px;
   text-align: center;
-  height: 68px;
-  min-width: 155px;
-  padding: 5px;
-}
-
-th:first-child,
-td:first-child {
-  min-width: 58px;
-  width: 58px;
 }
 
 th {
-  background: #91c978;
-  color: #111;
-  font-size: 18px;
-  font-weight: 700;
+  background: #91c77b;
 }
 
-.number-cell {
-  font-weight: 700;
-  font-size: 17px;
+.row-number {
+  width: 45px;
   background: #fafafa;
 }
 
 input {
   width: 100%;
-  height: 52px;
-  border: 1px solid #d7ddd5;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 18px;
-  background: white;
+  border: none;
   outline: none;
+  background: transparent;
+  text-align: center;
+  font-size: 16px;
+  padding: 7px;
 }
 
 input:focus {
-  border: 2px solid #82c56d;
+  background: #eef8ea;
 }
 
-.kg-input::placeholder,
-.less-input::placeholder,
-.price-input::placeholder {
-  color: #aaa;
-}
-
-/* Summary rows */
-.summary-label {
-  background: #dcefd6;
-  font-weight: 700;
-  font-size: 17px;
-  text-align: left;
-  padding-left: 12px;
-}
-
-.total-kilo-row td {
-  background: #dcefd6;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.less-row td {
-  background: #fff;
-}
-
-.remaining-row td {
-  background: #f1f7ef;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.price-row td {
-  background: white;
-}
-
-.total-row td {
-  background: #91c978;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.grand-total {
+.summary {
   margin-top: 15px;
-  background: #82c56d;
-  color: white;
-  padding: 18px 12px;
-  border-radius: 16px;
-  text-align: center;
-  font-size: 21px;
-  font-weight: 800;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
-.help {
+.summary-row {
+  display: grid;
+  grid-template-columns: 150px repeat(6, minmax(90px, 1fr));
+  min-width: 700px;
+}
+
+.summary-container {
+  overflow-x: auto;
+}
+
+.summary-row > div {
+  border: 1px solid #ccc;
+  padding: 9px;
   text-align: center;
-  color: #777;
-  font-size: 13px;
-  margin-top: 10px;
+}
+
+.summary-label {
+  font-weight: bold;
+  background: #f5f5f5;
+}
+
+.total-row > div {
+  background: #a8d394;
+  font-weight: bold;
+}
+
+.price-row input {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.bottom-total {
+  margin-top: 15px;
+  background: #79b766;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 8px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
-  <div class="topbar">
-    <div class="title">🥕 Carrot Calculator</div>
-    <div class="saved" id="savedText">Saved</div>
-  </div>
+<h1>🥕 Carrot Calculator</h1>
+<div class="subtitle">KG & Amount Calculator</div>
 
-  <!-- CLIENT / SHEET BUTTONS -->
-  <div class="sheet-bar" id="sheetBar"></div>
+<div class="sheet-controls">
+  <button class="add-sheet" onclick="addSheet()">＋ Add Sheet</button>
+  <button class="remove-sheet" onclick="removeSheet()">− Remove Sheet</button>
+</div>
 
-  <button class="remove-sheet" onclick="removeSheet()">
-    − Remove Sheet
-  </button>
+<div class="sheet-tabs" id="sheetTabs"></div>
 
-  <!-- BUYER CONTROLS -->
-  <div class="controls">
-    <button class="add-btn" onclick="addBuyer()">
-      + Add Buyer
-    </button>
+<div class="table-wrap">
+<table id="buyerTable">
+<thead>
+<tr id="buyerHeaders">
+<th class="row-number">#</th>
+</tr>
+</thead>
 
-    <button class="remove-btn" onclick="removeBuyer()">
-      − Remove Buyer
-    </button>
-  </div>
+<tbody id="buyerRows"></tbody>
+</table>
+</div>
 
-  <!-- CALCULATOR -->
-  <div class="table-wrap">
-    <table id="calculatorTable">
-      <thead>
-        <tr id="headerRow">
-          <th>#</th>
-        </tr>
-      </thead>
+<div class="summary-container">
+<div class="summary">
 
-      <tbody id="tableBody"></tbody>
+<div class="summary-row total-row" id="totalKiloRow">
+<div class="summary-label">Total Kilo</div>
+</div>
 
-      <tfoot>
+<div class="summary-row" id="lessRow">
+<div class="summary-label">Less</div>
+</div>
 
-        <!-- TOTAL KILO -->
-        <tr class="total-kilo-row">
-          <td class="summary-label">Total Kilo</td>
-        </tr>
+<div class="summary-row" id="remainingRow">
+<div class="summary-label">Total Kilo</div>
+</div>
 
-        <!-- LESS -->
-        <tr class="less-row">
-          <td class="summary-label">Less</td>
-        </tr>
+<div class="summary-row price-row" id="priceRow">
+<div class="summary-label">Price</div>
+</div>
 
-        <!-- REMAINING -->
-        <tr class="remaining-row">
-          <td class="summary-label">Total Kilo</td>
-        </tr>
+<div class="summary-row total-row" id="amountRow">
+<div class="summary-label">Total</div>
+</div>
 
-        <!-- PRICE -->
-        <tr class="price-row">
-          <td class="summary-label">Price</td>
-        </tr>
+</div>
+</div>
 
-        <!-- TOTAL -->
-        <tr class="total-row">
-          <td class="summary-label">Total</td>
-        </tr>
-
-      </tfoot>
-    </table>
-  </div>
-
-  <div class="grand-total" id="grandTotal">
-    Σ of Total: ₱0.00
-  </div>
-
-  <div class="help">
-    Enter KG and Price manually. Less can also be adjusted manually.
-  </div>
+<div class="bottom-total">
+Σ of Total: <span id="grandTotal">0.00</span>
+</div>
 
 </div>
 
 <script>
 
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-const ROWS = 10;
-
-/*
-   Starts with 6 buyers.
-   You can add more using + Add Buyer.
-*/
-const STARTING_BUYERS = 6;
-
-
-/* =========================================================
-   DATA
-========================================================= */
-
 let sheets = [];
 let currentSheet = 0;
 
-
-/* =========================================================
-   CREATE NEW SHEET
-========================================================= */
+const MAX_VISIBLE_BUYERS = 6;
+const ROWS = 10;
 
 function createSheet(name) {
-
-  const buyers = [];
-
-  for (let i = 0; i < STARTING_BUYERS; i++) {
-
-    buyers.push({
-      name: "Buyer " + (i + 1),
-      kg: Array(ROWS).fill(""),
-      less: "10",
-      price: ""
-    });
-
-  }
-
   return {
     name: name,
-    buyers: buyers
+    buyers: Array(MAX_VISIBLE_BUYERS).fill().map((_, i) => ({
+      name: "Buyer " + (i + 1),
+      kilos: Array(ROWS).fill("")
+    })),
+    less: Array(MAX_VISIBLE_BUYERS).fill(10),
+    price: Array(MAX_VISIBLE_BUYERS).fill("")
   };
 }
 
+sheets.push(createSheet("Carrot 1"));
 
-/* =========================================================
-   LOAD DATA
-========================================================= */
+function addSheet() {
+  sheets.push(createSheet("Carrot " + (sheets.length + 1)));
+  currentSheet = sheets.length - 1;
+  render();
+}
 
-function loadData() {
-
-  const saved = localStorage.getItem("carrotCalculatorData");
-
-  if (saved) {
-
-    try {
-
-      const data = JSON.parse(saved);
-
-      if (data && data.sheets && data.sheets.length) {
-
-        sheets = data.sheets;
-        currentSheet = data.currentSheet || 0;
-
-        return;
-      }
-
-    } catch (error) {
-      console.log("Saved data could not be loaded.");
-    }
+function removeSheet() {
+  if (sheets.length <= 1) {
+    alert("You need at least one sheet.");
+    return;
   }
 
-  sheets = [
-    createSheet("Client 1")
-  ];
-
-  currentSheet = 0;
+  sheets.splice(currentSheet, 1);
+  currentSheet = Math.max(0, currentSheet - 1);
+  render();
 }
 
-
-/* =========================================================
-   SAVE DATA
-========================================================= */
-
-function saveData() {
-
-  localStorage.setItem(
-    "carrotCalculatorData",
-    JSON.stringify({
-      sheets: sheets,
-      currentSheet: currentSheet
-    })
-  );
-
-  document.getElementById("savedText").textContent = "Saved";
-
-  setTimeout(() => {
-    document.getElementById("savedText").textContent = "Saved";
-  }, 500);
+function render() {
+  renderTabs();
+  renderTable();
+  calculate();
 }
 
-
-/* =========================================================
-   RENDER SHEET BUTTONS
-========================================================= */
-
-function renderSheets() {
-
-  const bar = document.getElementById("sheetBar");
-
-  bar.innerHTML = "";
+function renderTabs() {
+  const tabs = document.getElementById("sheetTabs");
+  tabs.innerHTML = "";
 
   sheets.forEach((sheet, index) => {
-
     const button = document.createElement("button");
 
-    button.className = "sheet-btn";
+    button.className = "sheet-tab" +
+      (index === currentSheet ? " active" : "");
 
     button.textContent = sheet.name;
 
-    button.onclick = function() {
-
+    button.onclick = () => {
       currentSheet = index;
-
       render();
-
     };
 
-    bar.appendChild(button);
-
+    tabs.appendChild(button);
   });
 }
 
+function renderTable() {
 
-/* =========================================================
-   RENDER CALCULATOR
-========================================================= */
+  const header = document.getElementById("buyerHeaders");
+  const rows = document.getElementById("buyerRows");
 
-function render() {
-
-  renderSheets();
+  header.innerHTML = '<th class="row-number">#</th>';
+  rows.innerHTML = "";
 
   const sheet = sheets[currentSheet];
-
-  const headerRow = document.getElementById("headerRow");
-
-  const tableBody = document.getElementById("tableBody");
-
-  /*
-    Rebuild header
-  */
-
-  headerRow.innerHTML = "<th>#</th>";
 
   sheet.buyers.forEach((buyer, buyerIndex) => {
 
     const th = document.createElement("th");
 
     const input = document.createElement("input");
-
     input.value = buyer.name;
 
-    input.placeholder = "Buyer " + (buyerIndex + 1);
-
-    input.style.fontWeight = "700";
-    input.style.background = "transparent";
-    input.style.border = "none";
-
     input.oninput = function() {
-
-      buyer.name = input.value;
-
-      saveData();
-
+      sheet.buyers[buyerIndex].name = this.value;
     };
 
     th.appendChild(input);
-
-    headerRow.appendChild(th);
-
+    header.appendChild(th);
   });
-
-
-  /*
-    Build the 10 KG rows
-  */
-
-  tableBody.innerHTML = "";
 
   for (let row = 0; row < ROWS; row++) {
 
     const tr = document.createElement("tr");
 
     const number = document.createElement("td");
-
-    number.className = "number-cell";
-
+    number.className = "row-number";
     number.textContent = row + 1;
 
     tr.appendChild(number);
 
-
-    sheet.buyers.forEach((buyer) => {
+    sheet.buyers.forEach((buyer, buyerIndex) => {
 
       const td = document.createElement("td");
 
       const input = document.createElement("input");
-
-      input.className = "kg-input";
-
       input.type = "number";
-
       input.inputMode = "decimal";
-
-      input.min = "0";
-
-      input.step = "0.01";
-
       input.placeholder = "KG";
-
-      input.value = buyer.kg[row] || "";
+      input.value = buyer.kilos[row];
 
       input.oninput = function() {
-
-        buyer.kg[row] = input.value;
-
+        sheet.buyers[buyerIndex].kilos[row] = this.value;
         calculate();
-
-        saveData();
-
       };
 
       td.appendChild(input);
-
       tr.appendChild(td);
-
     });
 
-    tableBody.appendChild(tr);
-
+    rows.appendChild(tr);
   }
 
-
-  /*
-    Build summary rows
-  */
-
-  buildSummaryRows();
-
-  calculate();
+  // Add the 6 buyer columns
+  // More columns can be added by increasing MAX_VISIBLE_BUYERS.
+  updateSummary();
 }
 
-
-/* =========================================================
-   SUMMARY ROWS
-========================================================= */
-
-function buildSummaryRows() {
+function updateSummary() {
 
   const sheet = sheets[currentSheet];
 
-  const totalKiloRow =
-    document.querySelector(".total-kilo-row");
+  const totalRow = document.getElementById("totalKiloRow");
+  const lessRow = document.getElementById("lessRow");
+  const remainingRow = document.getElementById("remainingRow");
+  const priceRow = document.getElementById("priceRow");
+  const amountRow = document.getElementById("amountRow");
 
-  const lessRow =
-    document.querySelector(".less-row");
+  totalRow.innerHTML = '<div class="summary-label">Total Kilo</div>';
+  lessRow.innerHTML = '<div class="summary-label">Less</div>';
+  remainingRow.innerHTML = '<div class="summary-label">Total Kilo</div>';
+  priceRow.innerHTML = '<div class="summary-label">Price</div>';
+  amountRow.innerHTML = '<div class="summary-label">Total</div>';
 
-  const remainingRow =
-    document.querySelector(".remaining-row");
+  sheet.buyers.forEach((buyer, index) => {
 
-  const priceRow =
-    document.querySelector(".price-row");
+    const total = buyer.kilos.reduce((sum, value) => {
+      return sum + (parseFloat(value) || 0);
+    }, 0);
 
-  const totalRow =
-    document.querySelector(".total-row");
+    const totalCell = document.createElement("div");
+    totalCell.textContent = total.toFixed(2);
+    totalRow.appendChild(totalCell);
 
-
-  /*
-    Keep first label cell
-  */
-
-  while (totalKiloRow.children.length > 1)
-    totalKiloRow.removeChild(totalKiloRow.lastChild);
-
-  while (lessRow.children.length > 1)
-    lessRow.removeChild(lessRow.lastChild);
-
-  while (remainingRow.children.length > 1)
-    remainingRow.removeChild(remainingRow.lastChild);
-
-  while (priceRow.children.length > 1)
-    priceRow.removeChild(priceRow.lastChild);
-
-  while (totalRow.children.length > 1)
-    totalRow.removeChild(totalRow.lastChild);
-
-
-  sheet.buyers.forEach((buyer, buyerIndex) => {
-
-    /* TOTAL KILO */
-
-    const totalCell = document.createElement("td");
-
-    totalCell.id = "totalKilo-" + buyerIndex;
-
-    totalCell.textContent = "0.00";
-
-    totalKiloRow.appendChild(totalCell);
-
-
-    /* LESS */
-
-    const lessCell = document.createElement("td");
+    const lessCell = document.createElement("div");
 
     const lessInput = document.createElement("input");
-
     lessInput.type = "number";
-
-    lessInput.inputMode = "decimal";
-
-    lessInput.step = "0.01";
-
-    lessInput.className = "less-input";
-
-    lessInput.value = buyer.less;
+    lessInput.value = sheet.less[index];
 
     lessInput.oninput = function() {
-
-      buyer.less = lessInput.value;
-
+      sheet.less[index] = parseFloat(this.value) || 0;
       calculate();
-
-      saveData();
-
     };
 
     lessCell.appendChild(lessInput);
-
     lessRow.appendChild(lessCell);
 
+    const remaining = total - sheet.less[index];
 
-    /* REMAINING KILO */
-
-    const remainingCell = document.createElement("td");
-
-    remainingCell.id = "remaining-" + buyerIndex;
-
-    remainingCell.textContent = "0.00";
-
+    const remainingCell = document.createElement("div");
+    remainingCell.textContent = remaining.toFixed(2);
     remainingRow.appendChild(remainingCell);
 
-
-    /* PRICE */
-
-    const priceCell = document.createElement("td");
+    const priceCell = document.createElement("div");
 
     const priceInput = document.createElement("input");
-
     priceInput.type = "number";
-
-    priceInput.inputMode = "decimal";
-
-    priceInput.step = "0.01";
-
-    priceInput.min = "0";
-
-    priceInput.className = "price-input";
-
     priceInput.placeholder = "₱ Price";
-
-    priceInput.value = buyer.price;
+    priceInput.value = sheet.price[index];
 
     priceInput.oninput = function() {
-
-      buyer.price = priceInput.value;
-
+      sheet.price[index] = this.value;
       calculate();
-
-      saveData();
-
     };
 
     priceCell.appendChild(priceInput);
-
     priceRow.appendChild(priceCell);
 
+    const amountCell = document.createElement("div");
+    const price = parseFloat(sheet.price[index]) || 0;
 
-    /* TOTAL */
+    amountCell.textContent =
+      (remaining * price).toFixed(2);
 
-    const totalAmountCell = document.createElement("td");
-
-    totalAmountCell.id = "totalAmount-" + buyerIndex;
-
-    totalAmountCell.textContent = "0.00";
-
-    totalRow.appendChild(totalAmountCell);
-
+    amountRow.appendChild(amountCell);
   });
-
 }
 
-
-/* =========================================================
-   CALCULATION
-========================================================= */
-
 function calculate() {
+
+  updateSummary();
 
   const sheet = sheets[currentSheet];
 
   let grandTotal = 0;
 
+  sheet.buyers.forEach((buyer, index) => {
 
-  sheet.buyers.forEach((buyer, buyerIndex) => {
+    const total = buyer.kilos.reduce((sum, value) => {
+      return sum + (parseFloat(value) || 0);
+    }, 0);
 
-    /*
-      Add all KG entered for this buyer
-    */
+    const remaining = total - sheet.less[index];
+    const price = parseFloat(sheet.price[index]) || 0;
 
-    let totalKilo = 0;
-
-    buyer.kg.forEach(value => {
-
-      const number = parseFloat(value);
-
-      if (!isNaN(number)) {
-
-        totalKilo += number;
-
-      }
-
-    });
-
-
-    /*
-      LESS
-
-      This is manually adjustable.
-      Example:
-
-      Total KG = 25
-      Less = 10
-      Remaining = 15
-    */
-
-    let less = parseFloat(buyer.less);
-
-    if (isNaN(less)) {
-      less = 0;
-    }
-
-
-    /*
-      Remaining KG cannot go below zero.
-    */
-
-    let remaining = totalKilo - less;
-
-    if (remaining < 0) {
-      remaining = 0;
-    }
-
-
-    /*
-      PRICE
-    */
-
-    let price = parseFloat(buyer.price);
-
-    if (isNaN(price)) {
-      price = 0;
-    }
-
-
-    /*
-      TOTAL AMOUNT
-
-      Remaining KG × Price
-    */
-
-    const totalAmount = remaining * price;
-
-    grandTotal += totalAmount;
-
-
-    /*
-      Display values
-    */
-
-    const totalKiloCell =
-      document.getElementById("totalKilo-" + buyerIndex);
-
-    const remainingCell =
-      document.getElementById("remaining-" + buyerIndex);
-
-    const totalAmountCell =
-      document.getElementById("totalAmount-" + buyerIndex);
-
-
-    if (totalKiloCell) {
-      totalKiloCell.textContent =
-        totalKilo.toFixed(2);
-    }
-
-    if (remainingCell) {
-      remainingCell.textContent =
-        remaining.toFixed(2);
-    }
-
-    if (totalAmountCell) {
-      totalAmountCell.textContent =
-        "₱" + totalAmount.toFixed(2);
-    }
-
+    grandTotal += remaining * price;
   });
-
-
-  /*
-    GRAND TOTAL
-  */
 
   document.getElementById("grandTotal").textContent =
-    "Σ of Total: ₱" + grandTotal.toFixed(2);
-
+    grandTotal.toFixed(2);
 }
-
-
-/* =========================================================
-   ADD BUYER
-========================================================= */
-
-function addBuyer() {
-
-  const sheet = sheets[currentSheet];
-
-  const number = sheet.buyers.length + 1;
-
-  sheet.buyers.push({
-
-    name: "Buyer " + number,
-
-    kg: Array(ROWS).fill(""),
-
-    less: "10",
-
-    price: ""
-
-  });
-
-  saveData();
-
-  render();
-
-}
-
-
-/* =========================================================
-   REMOVE BUYER
-========================================================= */
-
-function removeBuyer() {
-
-  const sheet = sheets[currentSheet];
-
-  /*
-    Keep at least one buyer.
-  */
-
-  if (sheet.buyers.length <= 1) {
-
-    alert("You need at least 1 buyer.");
-
-    return;
-
-  }
-
-  sheet.buyers.pop();
-
-  saveData();
-
-  render();
-
-}
-
-
-/* =========================================================
-   ADD NEW CLIENT SHEET
-========================================================= */
-
-function addSheet() {
-
-  const number = sheets.length + 1;
-
-  sheets.push(
-    createSheet("Client " + number)
-  );
-
-  currentSheet = sheets.length - 1;
-
-  saveData();
-
-  render();
-
-}
-
-
-/* =========================================================
-   REMOVE CLIENT SHEET
-========================================================= */
-
-function removeSheet() {
-
-  if (sheets.length <= 1) {
-
-    alert("You need at least 1 client sheet.");
-
-    return;
-
-  }
-
-
-  const sheetName =
-    sheets[currentSheet].name;
-
-  const confirmDelete =
-    confirm(
-      "Remove " + sheetName + "?"
-    );
-
-  if (!confirmDelete) {
-    return;
-  }
-
-
-  sheets.splice(currentSheet, 1);
-
-
-  if (currentSheet >= sheets.length) {
-
-    currentSheet =
-      sheets.length - 1;
-
-  }
-
-
-  saveData();
-
-  render();
-
-}
-
-
-/* =========================================================
-   NEW SHEET BUTTON
-========================================================= */
-
-document
-  .querySelector(".new-sheet");
-
-</script>
-
-<!--
-  The New Sheet button is created here so it can call addSheet().
--->
-<script>
-
-(function() {
-
-  const bar =
-    document.getElementById("sheetBar");
-
-  const newButton =
-    document.createElement("button");
-
-  newButton.className = "new-sheet";
-
-  newButton.textContent = "+ New Sheet";
-
-  newButton.onclick = function() {
-
-    addSheet();
-
-  };
-
-  /*
-    Put the New Sheet button after the client buttons.
-  */
-
-  bar.parentNode.insertBefore(
-    newButton,
-    bar.nextSibling
-  );
-
-})();
-
-
-/* Start application */
-
-loadData();
 
 render();
 
